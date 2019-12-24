@@ -1,11 +1,10 @@
-#include <string>
 #include <optional>
+#include <string>
 
 using namespace std;
 
 class SimpleHttpClient {
-public:
-
+ public:
   struct Response {
     unsigned int code;
     optional<string> data;
@@ -16,7 +15,7 @@ public:
   // Make a HTTP GET request, returning the body of the payload
   Response get(const string &path);
 
-private:
+ private:
   string d_host;
   unsigned short d_port;
 };
