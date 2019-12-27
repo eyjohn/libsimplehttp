@@ -11,6 +11,8 @@
 #include <optional>
 #include <string>
 
+#include "beast_carrier.h"
+
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;    // from <boost/beast/http.hpp>
 namespace net = boost::asio;     // from <boost/asio.hpp>
@@ -18,30 +20,6 @@ using tcp = net::ip::tcp;        // from <boost/asio/ip/tcp.hpp>
 
 using namespace std;
 using namespace opentracing;
-
-namespace {
-template <class Body, class Fields>
-class BoostBeastHTTPHeadersWriter : public HTTPHeadersWriter {
- public:
-  BoostBeastHTTPHeadersWriter(http::request<Body, Fields>& request)
-      : d_request(request) {}
-
-  expected<void> Set(opentracing::string_view key,
-                     opentracing::string_view value) const override {
-    d_request.set(key.data(), value.data());
-    return {};
-  }
-
- private:
-  http::request<Body, Fields>& d_request;
-};
-
-template <class Body, class Fields>
-BoostBeastHTTPHeadersWriter<Body, Fields> make_boost_beast_http_headers_writer(
-    http::request<Body, Fields>& request) {
-  return {request};
-}
-}  // namespace
 
 SimpleHttpClient::SimpleHttpClient(const string& host, unsigned short port)
     : d_host(host), d_port(port) {}

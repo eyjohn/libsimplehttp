@@ -3,12 +3,13 @@
 #include <opentracing/propagation.h>
 #include <opentracing/tracer.h>
 
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 #include <string>
+
+#include "beast_carrier.h"
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;    // from <boost/beast/http.hpp>
@@ -17,59 +18,6 @@ using tcp = asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 using namespace std;
 using namespace opentracing;
-
-namespace {
-
-template <class Body, class Fields>
-class BoostBeastHTTPHeadersReader : public HTTPHeadersReader {
- public:
-  BoostBeastHTTPHeadersReader(const http::request<Body, Fields>& request)
-      : d_request(request) {}
-
-  expected<opentracing::string_view> LookupKey(
-      opentracing::string_view key) const override {
-    auto it = d_request.find(key.data());
-    if (it != d_request.end()) {
-      return {read_value(it->value())};
-    }
-    return make_unexpected(key_not_found_error);
-  }
-
-  expected<void> ForeachKey(
-      std::function<expected<void>(opentracing::string_view key,
-                                   opentracing::string_view value)>
-          f) const override {
-    for (const auto& keyval : d_request) {
-      f(read_key(keyval.name_string()), read_value(keyval.value()));
-    }
-    return {};
-  }
-
- private:
-  std::string& read_value(boost::string_view val) const {
-    // Beast returns "val\n"
-    d_value = std::string{val};
-    boost::algorithm::trim(d_value);
-    return d_value;
-  }
-  std::string& read_key(boost::string_view key) const {
-    // Beast returns "key: val\n"
-    d_key = std::string{key};
-    d_key = d_key.substr(0, d_key.find(":"));
-    return d_key;
-  }
-  const http::request<Body, Fields>& d_request;
-  mutable std::string d_value;
-  mutable std::string d_key;
-};
-
-template <class Body, class Fields>
-BoostBeastHTTPHeadersReader<Body, Fields> make_boost_beast_http_headers_reader(
-    http::request<Body, Fields>& request) {
-  return {request};
-}
-
-}  // namespace
 
 SimpleHttpServer::SimpleHttpServer(const string& address, unsigned short port,
                                    unsigned int thread_count)
