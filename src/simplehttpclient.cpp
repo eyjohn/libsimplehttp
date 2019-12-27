@@ -24,7 +24,7 @@ using namespace opentracing;
 SimpleHttpClient::SimpleHttpClient(const string& host, unsigned short port)
     : d_host(host), d_port(port) {}
 
-SimpleHttpClient::Response SimpleHttpClient::get(const string& path) {
+Response SimpleHttpClient::make_request(const Request& request) {
   // The io_context is required for all I/O
   net::io_context ioc;
 
@@ -39,27 +39,27 @@ SimpleHttpClient::Response SimpleHttpClient::get(const string& path) {
   stream.connect(results);
 
   // Set up an HTTP GET request message
-  http::request<http::string_body> req{http::verb::get, path, 11};
-  req.set(http::field::host, d_host);
-  req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  http::request<http::string_body> http_req{http::verb::get, request.path, 11};
+  http_req.set(http::field::host, d_host);
+  http_req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 
   // Embed the tracing context into HTTP Header
   auto tracer = opentracing::Tracer::Global();
   auto span = tracer->ScopeManager().ActiveSpan();
   span->tracer().Inject(span->context(),
-                        make_boost_beast_http_headers_writer(req));
+                        make_boost_beast_http_headers_writer(http_req));
 
   // Send the HTTP request to the remote host
-  http::write(stream, req);
+  http::write(stream, http_req);
 
   // This buffer is used for reading and must be persisted
   beast::flat_buffer buffer;
 
   // Declare a container to hold the response
-  http::response<http::string_body> res;
+  http::response<http::string_body> http_res;
 
   // Receive the HTTP response
-  http::read(stream, buffer, res);
+  http::read(stream, buffer, http_res);
 
   // Gracefully close the socket
   beast::error_code ec;
@@ -71,5 +71,5 @@ SimpleHttpClient::Response SimpleHttpClient::get(const string& path) {
 
   // If we get here then the connection is closed gracefully
 
-  return Response{res.result_int(), res.body().data()};
+  return {http_res.result_int(), http_res.body().data()};
 }

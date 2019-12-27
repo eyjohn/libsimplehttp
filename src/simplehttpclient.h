@@ -1,19 +1,15 @@
-#include <optional>
 #include <string>
+
+#include "common.h"
 
 using namespace std;
 
 class SimpleHttpClient {
  public:
-  struct Response {
-    unsigned int code;
-    optional<string> data;
-  };
+  SimpleHttpClient(const string& host, unsigned short port = 80);
 
-  SimpleHttpClient(const string &host, unsigned short port = 80);
-
-  // Make a HTTP GET request, returning the body of the payload
-  Response get(const string &path);
+  // Make a HTTP request, returning the body of the payload
+  Response make_request(const Request& request);
 
  private:
   string d_host;

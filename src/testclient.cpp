@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 
+#include "common.h"
 #include "simplehttpclient.h"
 
 using namespace opentracing;
@@ -42,7 +43,7 @@ int main(int argc, char** argv) {
     // Life-time of span is only within this scope.
     auto span = std::shared_ptr<Span>{tracer->StartSpan("testclient.request")};
     auto scope = tracer->ScopeManager().Activate(span);
-    auto resp = client.get(path);
+    auto resp = client.make_request(Request{path});
     std::cout << "Response code: " << resp.code
               << " data: " << resp.data.value_or("(None)") << std::endl;
   }
