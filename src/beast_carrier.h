@@ -1,3 +1,5 @@
+#pragma once
+
 #include <opentracing/propagation.h>
 
 #include <boost/algorithm/string/trim.hpp>

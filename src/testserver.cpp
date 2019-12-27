@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "common.h"
 #include "simplehttpserver.h"
 
 using namespace opentracing;
@@ -45,7 +46,7 @@ int main(int argc, char **argv) {
               << " data: " << request.data.value_or("(None)") << std::endl;
 
     string response = "You've requested the path: " + request.path;
-    return SimpleHttpServer::Response{200, response};
+    return Response{200, response};
   });
   tracer->Close();
   return EXIT_SUCCESS;
