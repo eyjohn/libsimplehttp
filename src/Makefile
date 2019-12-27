@@ -1,13 +1,21 @@
 
-LIBS=-lopentracing -lopentracing_mocktracer
-
 default: testclient testserver
 
-testclient: testclient.cpp simplehttpclient.cpp
-	g++ -std=c++17 ${LIBS} testclient.cpp simplehttpclient.cpp -o testclient
+SRCS=$(wildcard *.cpp)
+OBJS=$(SRCS:.cpp=.o )
 
-testserver: testserver.cpp simplehttpserver.cpp
-	g++ -std=c++17 ${LIBS} testserver.cpp simplehttpserver.cpp -o testserver
+CXXFLAGS=-std=c++17
+LDFLAGS=-lopentracing -lopentracing_mocktracer
+
+%.o: %.cpp 
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+testclient: testclient.o simplehttpclient.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+
+testserver: testserver.o simplehttpserver.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:
-	rm testclient testserver
+	rm -f *.o testclient testserver
+
