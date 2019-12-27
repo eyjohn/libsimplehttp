@@ -1,5 +1,6 @@
 #include "simplehttpclient.h"
 
+#include <opentracing/propagation.h>
 #include <opentracing/tracer.h>
 
 #include <boost/asio/connect.hpp>
@@ -7,7 +8,6 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
-#include <iostream>
 #include <optional>
 #include <string>
 
@@ -65,7 +65,7 @@ SimpleHttpClient::Response SimpleHttpClient::get(const string& path) {
   req.set(http::field::host, d_host);
   req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 
-  // Embed the trace Ids into HTTP Header
+  // Embed the tracing context into HTTP Header
   auto tracer = opentracing::Tracer::Global();
   auto span = tracer->ScopeManager().ActiveSpan();
   span->tracer().Inject(span->context(),
