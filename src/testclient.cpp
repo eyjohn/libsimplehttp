@@ -40,7 +40,8 @@ int main(int argc, char** argv) {
   // Make the request
   {
     // Life-time of span is only within this scope.
-    auto span = tracer->StartSpan("testclient.request");  
+    auto span = std::shared_ptr<Span>{tracer->StartSpan("testclient.request")};
+    auto scope = tracer->ScopeManager().Activate(span);
     auto resp = client.get(path);
     std::cout << "Response code: " << resp.code
               << " data: " << resp.data.value_or("(None)") << std::endl;
