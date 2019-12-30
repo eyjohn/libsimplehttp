@@ -22,6 +22,8 @@ using tcp = asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 using namespace std;
 using namespace opentracing;
 
+namespace simplehttp {
+
 namespace {
 void fail(beast::error_code ec, char const* what) {
   std::cerr << what << ": " << ec.message() << "\n";
@@ -198,3 +200,5 @@ void SimpleHttpServer::run(Callback cb) {
 }
 
 void SimpleHttpServer::stop() { d_io_context.stop(); }
+
+}  // namespace simplehttp

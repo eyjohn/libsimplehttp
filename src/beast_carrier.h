@@ -5,6 +5,8 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/beast/http.hpp>
 
+namespace simplehttp {
+
 template <class Body, class Fields>
 class BoostBeastHTTPHeadersWriter : public opentracing::HTTPHeadersWriter {
  public:
@@ -75,6 +77,8 @@ class BoostBeastHTTPHeadersReader : public opentracing::HTTPHeadersReader {
 
 template <class Body, class Fields>
 BoostBeastHTTPHeadersReader<Body, Fields> make_boost_beast_http_headers_reader(
-    boost::beast::http::request<Body, Fields>& request) {
+    const boost::beast::http::request<Body, Fields>& request) {
   return {request};
 }
+
+}  // namespace simplehttp

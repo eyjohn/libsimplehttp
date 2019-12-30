@@ -10,6 +10,8 @@
 #include "common.h"
 #include "simplehttpserver.h"
 
+using namespace std;
+using namespace simplehttp;
 using namespace opentracing;
 using namespace opentracing::mocktracer;
 

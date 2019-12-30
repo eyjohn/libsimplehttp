@@ -21,6 +21,8 @@ using tcp = net::ip::tcp;        // from <boost/asio/ip/tcp.hpp>
 using namespace std;
 using namespace opentracing;
 
+namespace simplehttp {
+
 SimpleHttpClient::SimpleHttpClient(const string& host, unsigned short port)
     : d_host(host), d_port(port) {}
 
@@ -73,3 +75,5 @@ Response SimpleHttpClient::make_request(const Request& request) {
 
   return {http_res.result_int(), http_res.body().data()};
 }
+
+}  // namespace simplehttp

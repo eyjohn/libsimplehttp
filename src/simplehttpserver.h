@@ -5,13 +5,14 @@
 
 #include "common.h"
 
-using namespace std;
+namespace simplehttp {
 
 class SimpleHttpServer {
  public:
-  using Callback = function<Response(const Request &)>;
+  using Callback = std::function<Response(const Request &)>;
 
-  SimpleHttpServer(const string &address = "0.0.0.0", unsigned short port = 80);
+  SimpleHttpServer(const std::string &address = "0.0.0.0",
+                   unsigned short port = 80);
 
   void run(Callback cb);
   void stop();
@@ -21,3 +22,5 @@ class SimpleHttpServer {
   boost::asio::ip::address d_address;
   unsigned short d_port;
 };
+
+}  // namespace simplehttp
