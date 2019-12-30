@@ -1,5 +1,5 @@
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
-#include <boost/asio/thread_pool.hpp>
 #include <functional>
 #include <string>
 
@@ -11,13 +11,13 @@ class SimpleHttpServer {
  public:
   using Callback = function<Response(const Request &)>;
 
-  SimpleHttpServer(const string &address = "0.0.0.0", unsigned short port = 80,
-                   unsigned int thread_count = 1);
+  SimpleHttpServer(const string &address = "0.0.0.0", unsigned short port = 80);
 
   void run(Callback cb);
+  void stop();
 
  private:
-  boost::asio::thread_pool d_pool;
+  boost::asio::io_context d_io_context;
   boost::asio::ip::address d_address;
   unsigned short d_port;
 };
