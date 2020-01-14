@@ -71,8 +71,9 @@ Response SimpleHttpClient::make_request(const Request& request) {
   // so don't bother reporting it.
   if (ec && ec != beast::errc::not_connected) throw beast::system_error{ec};
 
-  // If we get here then the connection is closed gracefully
+  span->SetTag("http_status", http_res.result_int());
 
+  // If we get here then the connection is closed gracefully
   return {http_res.result_int(), http_res.body().data()};
 }
 
